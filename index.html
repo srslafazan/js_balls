@@ -8,28 +8,28 @@
 
 	<script>
 
-	function Circle(cx, cy, html_id)
+	function Circle(cx, cy, html_id, r)
 	{
 		var html_id = html_id;
 		this.info = { cx: cx,  cy: cy };
-		
+		console.log(r);
 		//private function that generates a random number
 		var randomNumberBetween = function(min, max){
-			return Math.random()*(max-min) + min;
+			return Math.random() * (max - min) + min;
 		}
 
 		this.initialize = function(){
 			//give a random velocity for the circle
 			this.info.velocity = {
-				x: randomNumberBetween(-8,8),
-				y: randomNumberBetween(-8,8)
+				x: randomNumberBetween(-3,3),
+				y: randomNumberBetween(-3,3)
 			}
 
 			//create a circle 
 			var circle = makeSVG('circle', 
 				{ 	cx: this.info.cx,
 				  	cy: this.info.cy,
-				  	r:  10,
+				  	r:  r,
 				  	id: html_id,
 				  	style: "fill: black"
 				});
@@ -40,8 +40,8 @@
 		this.update = function(time){
 			var el = document.getElementById(html_id);
 
-			//see if the circle is going outside the browser. if it is, reverse the velocity
-			console.log(this.info.cx, this.info.cy);
+			// see if the circle is going outside the browser. if it is, reverse the velocity
+			// console.log(this.info.cx, this.info.cy);
 			if( this.info.cx > ( document.body.clientWidth - 30 ) || ( this.info.cx < 15) )
 			{
 				this.info.velocity.x = this.info.velocity.x * -1;
@@ -84,21 +84,46 @@
 			}
 		}
 
-		this.createNewCircle = function(x,y){
-			var new_circle = new Circle(x,y,counter++);
+		this.createNewCircle = function(x,y,r){
+			var new_circle = new Circle(x,y,counter++, r);
 			circles.push(new_circle);
 			// console.log('created a new circle!', new_circle);
 		}
 
 		//create one circle when the game starts
-		this.createNewCircle(document.body.clientWidth/2, document.body.clientHeight/2);
+		this.createNewCircle(document.body.clientWidth/2, document.body.clientHeight/2, 10);
 	}
 
 	var playground = new PlayGround();
 	setInterval(playground.loop, 15);
 
 	document.onclick = function(e) {
-		playground.createNewCircle(e.x,e.y);
+		var	time_pressed,
+			mousedown_time,
+			r;
+
+		function getTime(){
+			var date = new Date();
+			return date.getTime();
+		}
+
+		document.onmousedown = function(e){
+			mousedown_time = getTime();
+		}
+		
+		document.onmouseup = function(e){
+			t = getTime() - mousedown_time;
+			console.log('You held down your mouse for', t, 'miliseconds.');
+		}
+
+		console.log(t);
+		if (t !== undefined){
+			r = t/20;
+		} else {
+			r = 10;
+		}
+
+		playground.createNewCircle(e.x,e.y, r);
 	}
 	
 	</script>
